@@ -1,0 +1,100 @@
+<div style="display: flex;">
+    <!-- Main content -->
+    <div style="flex-grow: 1; padding: 10px;">
+
+        <h1>Welcome to Montreal Volleyball Club (MVC)</h1>
+        <div style="display: flex; align-items: flex-start; gap: 500px;">
+            <ul>
+                {% for table in tables %}
+                    <li><a href="{{ url_for('show_table', table_name=table) }}">{{ table }}</a> </li>
+                {% endfor %}
+            </ul>
+
+            <div style="display: flex; gap: 30px; align-items: flex-start; margin-top: 20px;">
+                <div>
+                    <h3 style="text-align: left;">Queries</h3>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; justify-items: center;">
+                        {% for i in range(8, 20) %}
+                            <form method="GET" action="/query/{{ i }}">
+                                <button type="submit" style="width: 50px; height: 50px;">Q{{ i }}</button>
+                            </form>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div>
+                    <h4>Custom SQL Query</h4>
+                    <form method="POST" action="/run_custom_query">
+                        <label for="custom_sql">Enter Custom SQL:</label><br>
+                        <textarea name="custom_sql" rows="5" cols="60" required></textarea><br>
+                        <button type="submit">Run Query</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+        <div style="margin-top: 15px; max-width: 600px;">
+            <h3>Create New Table</h3>
+            <form method="POST" action="/create_table" onsubmit="return gatherColumns()">
+                <label>Table Name:</label>
+                <input type="text" name="table_name" required style="margin-left: 10px; width: 250px;"><br><br>
+
+                <div id="columns-container">
+                    <label>Column 1:</label>
+                    <input type="text" name="column_input" placeholder="e.g., id INT PRIMARY KEY" required style="width: 250px;">
+                </div>
+
+                <button type="button" onclick="addColumnInput()" style="margin-top: 10px;">+ Add Column</button><br><br>
+
+                <input type="hidden" name="columns" id="columns">
+                <button type="submit">Create Table</button>
+            </form>
+        </div>
+
+        <script>
+            let columnCount = 1;
+
+            function addColumnInput() {
+                columnCount++;
+                const container = document.getElementById('columns-container');
+
+                const br = document.createElement('br');
+                const label = document.createElement('label');
+                label.innerText = `Column ${columnCount}: `;
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = 'column_input';
+                input.placeholder = 'e.g., name VARCHAR(100)';
+                input.required = true;
+
+                container.appendChild(br);
+                container.appendChild(label);
+                container.appendChild(input);
+            }
+
+            function gatherColumns() {
+                const inputs = document.getElementsByName('column_input');
+                const columnDefs = Array.from(inputs).map(input => input.value.trim()).filter(val => val);
+                document.getElementById('columns').value = columnDefs.join(', ');
+                return true;
+            }
+        </script>
+
+        <hr>
+        <div style="display: flex; align-items: flex-start; gap: 15px;">
+            <div>
+                <h3>Delete Table</h3>
+                <form method="POST" action="/delete_table">
+                    <label>Select Table:</label>
+                    <select name="delete_table_name">
+                        {% for table in tables %}
+                            <option value="{{ table }}">{{ table }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Delete Table</button>
+                </form>
+            </div>
+        </div>
+    </div> <!-- End main content -->
+</div>

@@ -1,0 +1,83 @@
+<h2>{{ table }}</h2>
+<table border="2">
+  <tr>
+    {% for col in columns %}
+      <th>{{ col }}</th>
+    {% endfor %}
+  </tr>
+  {% for row in rows %}
+    <tr>
+      {% for col in columns %}
+        <td>{{ row[col] }}</td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+</table>
+
+<br>
+<div style="margin-bottom: 20px;">
+  <button onclick="toggleSection('insert')">Insert</button>
+  <button onclick="toggleSection('edit')">Edit</button>
+  <button onclick="toggleSection('delete')">Delete</button>
+</div>
+
+<div id="insert-section" style="display: none;">
+  <h3>Insert New Row</h3>
+  <form method="POST" action="/insert_row/{{ table }}">
+    {% for col in columns %}
+        <label>
+        {{ col }}{% if not nullables[col] %}<span style="color: red;">*</span>{% endif %}:
+      </label>
+      <input type="text" name="{{ col }}" {% if not nullables[col] %}required{% endif %}>
+      <br>
+    {% endfor %}
+    <button type="submit">Confirm Insert</button>
+  </form>
+</div>
+
+<div id="edit-section" style="display: none;">
+  <h3>Edit Existing Row</h3>
+  <form method="POST" action="/edit_row/{{ table }}">
+    <p>Enter primary key(s) for the row to update:</p>
+    {% for pk_col in primary_keys %}
+        <label>{{ pk_col }}:</label>
+        <input type="hidden" name="pk_column_{{ loop.index }}" value="{{ pk_col }}">
+        <input type="text" name="pk_value_{{ loop.index }}" placeholder="Enter value for {{ pk_col }}">
+        <br><br>
+    {% endfor %}
+
+    <p>Leave a field blank if you don't want to change it:</p>
+    {% for col in columns %}
+      <label>New {{ col }}:</label>
+      <input type="text" name="{{ col }}">
+      <br>
+    {% endfor %}
+
+    <button type="submit">Confirm Edit</button>
+  </form>
+</div>
+
+<div id="delete-section" style="display: none;">
+  <h3>Delete Row</h3>
+  <form method="POST" action="/delete_row/{{ table }}">
+    <p>Enter primary key(s) for the row to delete:</p>
+    {% for pk_col in primary_keys %}
+        <label>{{ pk_col }}:</label>
+        <input type="hidden" name="pk_column_{{ loop.index }}" value="{{ pk_col }}">
+        <input type="text" name="pk_value_{{ loop.index }}" placeholder="Enter value for {{ pk_col }}">
+        <br><br>
+    {% endfor %}
+    <button type="submit">Confirm Delete</button>
+  </form>
+</div>
+
+<script>
+  function toggleSection(section) {
+    document.getElementById('insert-section').style.display = 'none';
+    document.getElementById('edit-section').style.display = 'none';
+    document.getElementById('delete-section').style.display = 'none';
+    document.getElementById(section + '-section').style.display = 'block';
+  }
+</script>
+
+<a href="/">← Back to Home</a>
