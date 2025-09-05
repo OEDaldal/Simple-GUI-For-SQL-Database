@@ -5,10 +5,10 @@ app = Flask(__name__)
 
 
 connection = mysql.connector.connect(
-    host="qtc353.encs.concordia.ca",
-    user="qtc353_1",
-    password="OP7383SP",
-    database="qtc353_1"
+    host="************************",
+    user="********",
+    password="********",
+    database="********"
 )
 cursor = connection.cursor(dictionary=True)
 
